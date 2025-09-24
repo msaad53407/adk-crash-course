@@ -17,7 +17,7 @@ session_service = InMemorySessionService()
 # ===== PART 2: Define Initial State =====
 # This will be used when creating a new session
 initial_state = {
-    "user_name": "Brandon Hancock",
+    "user_name": "",
     "purchased_courses": [],
     "interaction_history": [],
 }

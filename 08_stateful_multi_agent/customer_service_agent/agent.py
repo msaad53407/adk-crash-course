@@ -4,6 +4,23 @@ from .sub_agents.course_support_agent.agent import course_support_agent
 from .sub_agents.order_agent.agent import order_agent
 from .sub_agents.policy_agent.agent import policy_agent
 from .sub_agents.sales_agent.agent import sales_agent
+from google.adk.tools import ToolContext
+
+
+async def update_user_name(new_name: str, tool_context: ToolContext) -> dict[str, str]:
+    """Update the user's name in the session state.
+    Args:
+        new_name (str): The new name for the user.
+        tool_context (ToolContext): The tool context containing session information.
+
+    Returns:
+        dict[str, str]: A confirmation message.
+
+    """
+    print(f"--- Tool: update_user_name called with new_name: {new_name} ---")
+    tool_context.state["user_name"] = new_name
+
+    return {"action": "update_user_name", "new_name": new_name, "message": "User name updated successfully."}
 
 # Create the root customer service agent
 customer_service_agent = Agent(
@@ -12,6 +29,13 @@ customer_service_agent = Agent(
     description="Customer service agent for AI Developer Accelerator community",
     instruction="""
     You are the primary customer service agent for the AI Developer Accelerator community.
+
+    You will always greet the user by their name if it is available in state['user_name'].
+
+    If it is not available, you can ask for their name and use the tool 'update_user_name' to update it in state.
+
+    Make sure to ALWAYS ask the user's name before before proceeding with any other questions, If user does not provide their name, you can move on with the conversation.
+
     Your role is to help users with their questions and direct them to the appropriate specialized agent.
 
     **Core Capabilities:**
@@ -76,5 +100,5 @@ customer_service_agent = Agent(
     ask clarifying questions to better understand the user's needs.
     """,
     sub_agents=[policy_agent, sales_agent, course_support_agent, order_agent],
-    tools=[],
+    tools=[update_user_name],
 )
